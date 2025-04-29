@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [city, setCity] = useState('');
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const apiKey = 'YOUR_API_KEY'; // Ganti dengan API key dari OpenWeatherMap
+
+  const fetchWeather = async () => {
+    setLoading(true);
+    setError(null);
+    setWeather(null);
+
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+      );
+      if (!response.ok) {
+        throw new Error('Kota tidak ditemukan');
+      }
+      const data = await response.json();
+      setWeather(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (city.trim() !== '') {
+      fetchWeather();
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="container">
+      <h1>Weather App</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Masukkan nama kota"
+        />
+        <button type="submit">Cari</button>
+      </form>
+
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {weather && (
+        <div className="result">
+          <h2>{weather.name}</h2>
+          <p>Temp: {weather.main.temp}°C</p>
+          <p>Weather: {weather.weather[0].description}</p>
+          <p>Humidity: {weather.main.humidity}%</p>
+          <p>Wind: {weather.wind.speed} m/s</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
