@@ -7,7 +7,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiKey = 'YOUR_API_KEY'; // Ganti dengan API key dari OpenWeatherMap
+  const apiKey = '2d7a16d99feebf924b156570fd239269'; // Ganti dengan API key dari OpenWeatherMap
 
   const fetchWeather = async () => {
     setLoading(true);
